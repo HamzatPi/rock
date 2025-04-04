@@ -13,6 +13,24 @@ window.addEventListener("load", function () {
     countC = 0,
     blocked = false;
 
+  // Функция для обновления счета
+  function updateScore() {
+    countUser.innerText = countU;
+    countComp.innerText = countC;
+  }
+
+  // Функция для проигрывания звуков
+  function playSound(type) {
+    sound.setAttribute("src", `audio/${type}.mp3`);
+    sound.play();
+  }
+
+  // Функция для блокировки и разблокировки действий
+  function setBlocked(state) {
+    blocked = state;
+  }
+
+  // Обработчик выбора пользователя
   function choiceUser(e) {
     if (blocked) return;
     let target = e.target;
@@ -23,8 +41,10 @@ window.addEventListener("load", function () {
       choiceComp();
     }
   }
+
+  // Выбор компьютера
   function choiceComp() {
-    blocked = true;
+    setBlocked(true);
     let rand = Math.floor(Math.random() * 3);
     compField.classList.add("blink");
     let compFields = compField.querySelectorAll(".field");
@@ -36,52 +56,46 @@ window.addEventListener("load", function () {
       winner();
     }, 3000);
   }
+
+  // Определение победителя
   function winner() {
-    blocked = false;
+    setBlocked(false);
     let comb = userStep + compStep;
     switch (comb) {
       case "rr":
       case "ss":
       case "pp":
         res.innerText = "Ничья!";
-        sound.setAttribute("src", "audio/draw.mp3");
-        sound.play();
+        playSound("draw");
         break;
 
       case "rs":
       case "sp":
       case "pr":
         res.innerText = "Победили Вы!";
-        sound.setAttribute("src", "audio/win.mp3");
-        sound.play();
+        playSound("win");
         countU++;
-        countUser.innerText = countU;
-        compField
-          .querySelector("[data-field=" + compStep + "]")
-          .classList.add("error");
+        updateScore();
+        compField.querySelector("[data-field=" + compStep + "]").classList.add("error");
         break;
 
       case "sr":
       case "ps":
       case "rp":
         res.innerText = "Победил Компьютер!";
-
-        sound.setAttribute("src", "audio/loss.mp3");
-        sound.play();
+        playSound("loss");
         countC++;
-        countComp.innerText = countC;
-        userField
-          .querySelector("[data-field=" + userStep + "]")
-          .classList.add("error");
+        updateScore();
+        userField.querySelector("[data-field=" + userStep + "]").classList.add("error");
         break;
     }
   }
 
+
   function playGame() {
     countU = countC = 0;
     res.innerText = "Сделайте Выбор";
-    countUser.innerText = 0;
-    countComp.innerText = 0;
+    updateScore();
     fields.forEach((item) => item.classList.remove("active", "error"));
   }
 
